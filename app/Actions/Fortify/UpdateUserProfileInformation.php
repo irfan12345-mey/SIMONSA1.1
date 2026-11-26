@@ -2,7 +2,7 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
+use App\Models\Pengguna; 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -15,11 +15,18 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      *
      * @param  array<string, mixed>  $input
      */
-    public function update(User $user, array $input): void
+    public function update(Pengguna $user, array $input): void
     {
         Validator::make($input, [
             'nama' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:50', Rule::unique('pengguna')->ignore($user->id_pengguna)],
+            
+            // PERBAIKAN: Beritahu Laravel nama kolom unik dan nama primary key-nya
+            'username' => [
+                'required', 
+                'string', 
+                'max:50', 
+                Rule::unique('pengguna', 'username')->ignore($user->id_pengguna, 'id_pengguna')
+            ],
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
@@ -37,14 +44,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      *
      * @param  array<string, string>  $input
      */
-    protected function updateVerifiedUser(User $user, array $input): void
+    protected function updateVerifiedUser(Pengguna $user, array $input): void
     {
         $user->forceFill([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'email_verified_at' => null,
+            'nama' => $input['nama'],
+            'username' => $input['username'],
         ])->save();
-
-        $user->sendEmailVerificationNotification();
     }
 }

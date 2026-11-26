@@ -13,6 +13,35 @@
                 <x-section-border />
             @endif
 
+            {{-- ======================================================= --}}
+            {{-- TAMBAHAN BARU: BAGIAN PENGATURAN TEMA TAMPILAN         --}}
+            {{-- ======================================================= --}}
+            <div class="mt-10 sm:mt-0">
+                <x-form-section submit="dummy">
+                    <x-slot name="title">
+                        {{ __('Tema Tampilan') }}
+                    </x-slot>
+
+                    <x-slot name="description">
+                        {{ __('Ubah mode warna aplikasi sesuai preferensi Anda.') }}
+                    </x-slot>
+
+                    <x-slot name="form">
+                        {{-- Memanggil komponen tema yang akan kita buat --}}
+                        <x-theme-settings />
+                    </x-slot>
+
+                    <x-slot name="actions">
+                        {{-- Slot ini sengaja dikosongkan karena tema langsung berubah tanpa perlu tombol Save --}}
+                    </x-slot>
+                </x-form-section>
+            </div>
+            {{-- ======================================================= --}}
+            {{-- AKHIR DARI BAGIAN PENGATURAN TEMA                       --}}
+            {{-- ======================================================= --}}
+
+            <x-section-border />
+
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
                 <div class="mt-10 sm:mt-0">
                     @livewire('profile.update-password-form')
