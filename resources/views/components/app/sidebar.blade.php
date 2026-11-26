@@ -25,7 +25,7 @@
             </button>
             <!-- Logo -->
             <a class="block" href="{{ route('dashboard') }}">
-                <svg class="fill-violet-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                <svg class="fill-violet-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
                     <path d="M31.956 14.8C31.372 6.92 25.08.628 17.2.044V5.76a9.04 9.04 0 0 0 9.04 9.04h5.716ZM14.8 26.24v5.716C6.92 31.372.63 25.08.044 17.2H5.76a9.04 9.04 0 0 1 9.04 9.04Zm11.44-9.04h5.716c-.584 7.88-6.876 14.172-14.756 14.756V26.24a9.04 9.04 0 0 1 9.04-9.04ZM.044 14.8C.63 6.92 6.92.628 14.8.044V5.76a9.04 9.04 0 0 1-9.04 9.04H.044Z" />
                 </svg>
             </a>
@@ -33,6 +33,7 @@
 
         <!-- Links -->
         <div class="space-y-8">
+            
             <!-- Menu Utama -->
             <div>
                 <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
@@ -53,24 +54,17 @@
                             </div>
                         </a>
                     </li>
+                </ul>
+            </div>
 
-                    <!-- Kelola Pengguna (Hanya Admin) -->
-                    @if(auth()->user()->role === 'admin')
-                    <li class="mb-1 last:mb-0">
-                        <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('admin.pengguna.*')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('admin.pengguna.index') }}">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center truncate">
-                                    <svg class="w-3 h-3 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-2" viewBox="0 0 12 12">
-                                        <path d="M6 0a6 6 0 1 1 0 12A6 6 0 0 1 6 0Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
-                                    </svg>
-                                    <span class="text-sm font-medium">Kelola Pengguna</span>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    @endif
-
-                    <!-- Data Kebun (Berfungsi Penuh) -->
+            <!-- Master Data -->
+            <div>
+                <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
+                    <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
+                    <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Master Data</span>
+                </h3>
+                <ul class="mt-3">
+                    <!-- Data Kebun -->
                     <li class="mb-1 last:mb-0">
                         <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('kebun.*')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('kebun.index') }}">
                             <div class="flex items-center justify-between">
@@ -83,7 +77,6 @@
                             </div>
                         </a>
                     </li>
-
                     <!-- Data Blok -->
                     <li class="mb-1 last:mb-0">
                         <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('blok.*')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('blok.index') }}">
@@ -97,7 +90,16 @@
                             </div>
                         </a>
                     </li>
+                </ul>
+            </div>
 
+            <!-- Transaksi -->
+            <div>
+                <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
+                    <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
+                    <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Transaksi</span>
+                </h3>
+                <ul class="mt-3">
                     <!-- Hasil Panen -->
                     <li class="mb-1 last:mb-0">
                         <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('hasil-panen.*')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('hasil-panen.index') }}">
@@ -111,8 +113,7 @@
                             </div>
                         </a>
                     </li>
-
-                    <!-- Laporan & Analisis (P-06) -->
+                    <!-- Laporan Panen -->
                     <li class="mb-1 last:mb-0">
                         <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('hasil-panen.laporan')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('hasil-panen.laporan') }}">
                             <div class="flex items-center justify-between">
@@ -128,6 +129,31 @@
                 </ul>
             </div>
 
+            <!-- Sistem (Khusus Admin) -->
+            @if(auth()->user()->role === 'admin')
+            <div>
+                <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
+                    <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
+                    <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Sistem</span>
+                </h3>
+                <ul class="mt-3">
+                    <!-- Kelola Pengguna -->
+                    <li class="mb-1 last:mb-0">
+                        <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('admin.pengguna.*')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('admin.pengguna.index') }}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center truncate">
+                                    <svg class="w-3 h-3 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-2" viewBox="0 0 12 12">
+                                        <path d="M6 0a6 6 0 1 1 0 12A6 6 0 0 1 6 0Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+                                    </svg>
+                                    <span class="text-sm font-medium">Kelola Pengguna</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            @endif
+
             <!-- Akun -->
             <div>
                 <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
@@ -135,6 +161,18 @@
                     <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Akun</span>
                 </h3>
                 <ul class="mt-3">
+                    <!-- Profil -->
+                    <li class="mb-1 last:mb-0">
+                        <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 truncate transition duration-150 @if(request()->routeIs('profile.show')) text-gray-800 dark:text-gray-200 @endif" href="{{ route('profile.show') }}">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-2" viewBox="0 0 12 12">
+                                    <path d="M6 0a6 6 0 1 1 0 12A6 6 0 0 1 6 0Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+                                </svg>
+                                <span class="text-sm font-medium">Profil Saya</span>
+                            </div>
+                        </a>
+                    </li>
+                    <!-- Logout -->
                     <li class="mb-1 last:mb-0">
                         <form method="POST" action="{{ route('logout') }}" x-data>
                             @csrf
