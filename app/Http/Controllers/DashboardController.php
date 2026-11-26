@@ -16,6 +16,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // ==========================================
+        // 1. DASHBOARD ADMIN
+        // ==========================================
         if ($user->role === 'admin') {
             $totalPengguna = Pengguna::count();
             $totalKebun = Kebun::count();
@@ -23,52 +26,74 @@ class DashboardController extends Controller
             $totalPanen = HasilPanen::sum('berat_tbs_kg');
             $totalCatatan = HasilPanen::count();
 
-            return view('pages.admin.dashboard', compact('totalPengguna', 'totalKebun', 'totalBlok', 'totalPanen', 'totalCatatan'));
-        } elseif ($user->role === 'pemilik') {
-            // Ambil ID kebun milik pemilik ini
-            $kebunIds = Kebun::where('id_pemilik', $user->id_pengguna)->pluck('id_kebun');
-            $blokIds = Blok::whereIn('id_kebun', $kebunIds)->pluck('id_blok');
-
-            // Ringkasan
-            $totalPanen = HasilPanen::whereIn('id_blok', $blokIds)->sum('berat_tbs_kg');
-            $totalCatatan = HasilPanen::whereIn('id_blok', $blokIds)->count();
-            $totalBlok = $blokIds->count();
-
-            // Data Grafik: Total panen per bulan (6 bulan terakhir)
+            // Data Grafik Admin (6 bulan terakhir)
             $grafikData = HasilPanen::select(
                 DB::raw('DATE_FORMAT(tanggal_panen, "%Y-%m") as bulan'),
                 DB::raw('SUM(berat_tbs_kg) as total')
             )
-                ->whereIn('id_blok', $blokIds)
-                ->groupBy('bulan')
-                ->orderBy('bulan', 'asc')
-                ->limit(6)
-                ->get();
+            ->groupBy('bulan')
+            ->orderBy('bulan', 'asc')
+            ->limit(6)
+            ->get();
 
             $labels = $grafikData->pluck('bulan');
             $dataPanen = $grafikData->pluck('total');
 
-            // --- DATA PERBANDINGAN ANTARBLOK (P-05) ---
+            // 5 Catatan Terbaru untuk Admin
+            $catatanTerbaru = HasilPanen::with(['blok.kebun', 'petugas'])->latest()->take(5)->get();
+
+            return view('pages.admin.dashboard', compact(
+                'totalPengguna', 'totalKebun', 'totalBlok', 'totalPanen', 'totalCatatan',
+                'labels', 'dataPanen', 'catatanTerbaru'
+            ));
+        } 
+        
+        // ==========================================
+        // 2. DASHBOARD PEMILIK KEBUN
+        // ==========================================
+        elseif ($user->role === 'pemilik') {
+            $kebunIds = Kebun::where('id_pemilik', $user->id_pengguna)->pluck('id_kebun');
+            $blokIds = Blok::whereIn('id_kebun', $kebunIds)->pluck('id_blok');
+
+            $totalPanen = HasilPanen::whereIn('id_blok', $blokIds)->sum('berat_tbs_kg');
+            $totalCatatan = HasilPanen::whereIn('id_blok', $blokIds)->count();
+            $totalBlok = $blokIds->count();
+
+            // Data Grafik Pemilik
+            $grafikData = HasilPanen::select(
+                DB::raw('DATE_FORMAT(tanggal_panen, "%Y-%m") as bulan'),
+                DB::raw('SUM(berat_tbs_kg) as total')
+            )
+            ->whereIn('id_blok', $blokIds)
+            ->groupBy('bulan')
+            ->orderBy('bulan', 'asc')
+            ->limit(6)
+            ->get();
+
+            $labels = $grafikData->pluck('bulan');
+            $dataPanen = $grafikData->pluck('total');
+
+            // Data Perbandingan Antarblok (P-05)
             $perbandinganBlok = HasilPanen::select(
                 'id_blok',
                 DB::raw('SUM(berat_tbs_kg) as total_panen')
             )
-                ->whereIn('id_blok', $blokIds)
-                ->groupBy('id_blok')
-                ->with('blok.kebun')
-                ->orderByDesc('total_panen')
-                ->get();
-            // -------------------------------------------
+            ->whereIn('id_blok', $blokIds)
+            ->groupBy('id_blok')
+            ->with('blok.kebun')
+            ->orderByDesc('total_panen')
+            ->get();
 
             return view('pages.pemilik.dashboard', compact(
-                'totalPanen',
-                'totalCatatan',
-                'totalBlok',
-                'labels',
-                'dataPanen',
-                'perbandinganBlok'
+                'totalPanen', 'totalCatatan', 'totalBlok', 
+                'labels', 'dataPanen', 'perbandinganBlok'
             ));
-        } elseif ($user->role === 'petugas') {
+        } 
+        
+        // ==========================================
+        // 3. DASHBOARD PETUGAS
+        // ==========================================
+        elseif ($user->role === 'petugas') {
             $totalCatatanSaya = HasilPanen::where('id_petugas', $user->id_pengguna)->count();
             $totalPanenSaya = HasilPanen::where('id_petugas', $user->id_pengguna)->sum('berat_tbs_kg');
 
