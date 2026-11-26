@@ -1,57 +1,143 @@
 <x-authentication-layout>
-    <div class="flex items-center justify-center mb-6">
-        <svg class="fill-violet-500 w-10 h-10 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-            <path d="M31.956 14.8C31.372 6.92 25.08.628 17.2.044V5.76a9.04 9.04 0 0 0 9.04 9.04h5.716ZM14.8 26.24v5.716C6.92 31.372.63 25.08.044 17.2H5.76a9.04 9.04 0 0 1 9.04 9.04Zm11.44-9.04h5.716c-.584 7.88-6.876 14.172-14.756 14.756V26.24a9.04 9.04 0 0 1 9.04-9.04ZM.044 14.8C.63 6.92 6.92.628 14.8.044V5.76a9.04 9.04 0 0 1-9.04 9.04H.044Z" />
-        </svg>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Daftar Akun</h1>
+    <!-- Ikon Bulat di Atas -->
+    <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+        <div style="width: 4.5rem; height: 4.5rem; border-radius: 50%; border: 1px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; background-color: rgba(17, 36, 26, 0.8); box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);">
+            <img src="{{ asset('images/logo.png') }}" alt="Icon" style="width: 2.5rem; height: 2.5rem; object-fit: contain;" />
+        </div>
     </div>
-    
-    <form method="POST" action="{{ route('register') }}">
+
+    <!-- Judul -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="color: white; font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0;">Daftar Akun</h1>
+        <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Lengkapi data diri Anda untuk bergabung</p>
+    </div>
+
+    <form method="POST" action="{{ route('register') }}" style="display: flex; flex-direction: column; gap: 1rem;">
         @csrf
         
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1" for="nama">{{ __('Nama Lengkap') }}</label>
-            <input id="nama" class="form-input w-full" type="text" name="nama" value="{{ old('nama') }}" required autofocus />
-            @error('nama') <div class="text-xs mt-1 text-red-500">{{ $message }}</div> @enderror
+        <!-- Nama Lengkap -->
+        <div>
+            <label style="display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.4rem;">Nama Lengkap</label>
+            <input id="nama" style="display: block; width: 100%; padding: 0.75rem 1rem; background-color: #05100a !important; border: 1px solid #1f3d2c; border-radius: 0.75rem; color: white !important; font-size: 0.875rem; box-sizing: border-box; outline: none; transition: border 0.2s;" type="text" name="nama" value="{{ old('nama') }}" required autofocus placeholder="Masukkan nama lengkap" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#1f3d2c'" />
+            @error('nama')
+                <div style="font-size: 0.75rem; margin-top: 0.25rem; color: #f87171;">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1" for="username">{{ __('Username') }}</label>
-            <input id="username" class="form-input w-full" type="text" name="username" value="{{ old('username') }}" required />
-            @error('username') <div class="text-xs mt-1 text-red-500">{{ $message }}</div> @enderror
+        <!-- Username -->
+        <div>
+            <label style="display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.4rem;">Username</label>
+            <input id="username" style="display: block; width: 100%; padding: 0.75rem 1rem; background-color: #05100a !important; border: 1px solid #1f3d2c; border-radius: 0.75rem; color: white !important; font-size: 0.875rem; box-sizing: border-box; outline: none; transition: border 0.2s;" type="text" name="username" value="{{ old('username') }}" required placeholder="Pilih username unik" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#1f3d2c'" />
+            @error('username')
+                <div style="font-size: 0.75rem; margin-top: 0.25rem; color: #f87171;">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1" for="role">{{ __('Daftar Sebagai') }}</label>
-            <select id="role" name="role" class="form-select w-full" required>
-                <option value="">-- Pilih Role --</option>
-                <option value="pemilik" {{ old('role') == 'pemilik' ? 'selected' : '' }}>Pemilik Kebun</option>
-                <option value="petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>Petugas Pencatat Panen</option>
-            </select>
-            @error('role') <div class="text-xs mt-1 text-red-500">{{ $message }}</div> @enderror
+        <!-- Role / Daftar Sebagai (CUSTOM DROPDOWN JS) -->
+        <div>
+            <label style="display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.4rem;">Daftar Sebagai</label>
+            
+            <!-- Hidden input untuk menyimpan value yang akan dikirim ke server -->
+            <input type="hidden" name="role" id="role-input" value="{{ old('role') }}" required>
+            
+            <!-- Tampilan Kotak Dropdown -->
+            <div style="position: relative;">
+                <button type="button" id="dropdown-button" onclick="toggleDropdown()" style="width: 100%; padding: 0.75rem 1rem; background-color: #05100a !important; border: 1px solid #1f3d2c; border-radius: 0.75rem; color: #9ca3af; font-size: 0.875rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; outline: none; transition: border 0.2s;">
+                    <span id="dropdown-text">
+                        @if(old('role') == 'pemilik') Pemilik Kebun
+                        @elseif(old('role') == 'petugas') Petugas Panen
+                        @else -- Pilih Role -- @endif
+                    </span>
+                    <svg style="height: 1.25rem; width: 1.25rem; transition: transform 0.2s;" id="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+
+                <!-- Menu Pilihan (Tersembunyi by default) -->
+                <div id="dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; background-color: #0c1a13; border: 1px solid #1f3d2c; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 50; overflow: hidden;">
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                        <li onclick="selectRole('pemilik', 'Pemilik Kebun')" style="padding: 0.75rem 1rem; color: #d1d5db; font-size: 0.875rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#1f3d2c'" onmouseout="this.style.backgroundColor='transparent'">
+                            Pemilik Kebun
+                        </li>
+                        <li onclick="selectRole('petugas', 'Petugas Panen')" style="padding: 0.75rem 1rem; color: #d1d5db; font-size: 0.875rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#1f3d2c'" onmouseout="this.style.backgroundColor='transparent'">
+                            Petugas Panen
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @error('role')
+                <div style="font-size: 0.75rem; margin-top: 0.25rem; color: #f87171;">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1" for="password">{{ __('Password') }}</label>
-            <input id="password" class="form-input w-full" type="password" name="password" required />
-            @error('password') <div class="text-xs mt-1 text-red-500">{{ $message }}</div> @enderror
+        <!-- Password -->
+        <div>
+            <label style="display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.4rem;">Password</label>
+            <input id="password" style="display: block; width: 100%; padding: 0.75rem 1rem; background-color: #05100a !important; border: 1px solid #1f3d2c; border-radius: 0.75rem; color: white !important; font-size: 0.875rem; box-sizing: border-box; outline: none; transition: border 0.2s;" type="password" name="password" required placeholder="Minimal 8 karakter" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#1f3d2c'" />
+            @error('password')
+                <div style="font-size: 0.75rem; margin-top: 0.25rem; color: #f87171;">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1" for="password_confirmation">{{ __('Konfirmasi Password') }}</label>
-            <input id="password_confirmation" class="form-input w-full" type="password" name="password_confirmation" required />
+        <!-- Konfirmasi Password -->
+        <div>
+            <label style="display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.4rem;">Konfirmasi Password</label>
+            <input id="password_confirmation" style="display: block; width: 100%; padding: 0.75rem 1rem; background-color: #05100a !important; border: 1px solid #1f3d2c; border-radius: 0.75rem; color: white !important; font-size: 0.875rem; box-sizing: border-box; outline: none; transition: border 0.2s;" type="password" name="password_confirmation" required placeholder="Ketik ulang password" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#1f3d2c'" />
         </div>
 
-        <div class="mt-6">
-            <button type="submit" class="btn bg-violet-500 hover:bg-violet-600 text-white w-full py-2 rounded">
-                {{ __('Daftar Sekarang') }}
+        <!-- Tombol Daftar -->
+        <div style="padding-top: 0.5rem;">
+            <button type="submit" style="width: 100%; padding: 0.85rem 1rem; background-color: #10b981; color: #05100a; font-weight: 700; border-radius: 0.75rem; border: none; cursor: pointer; font-size: 1rem; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#34d399'" onmouseout="this.style.backgroundColor='#10b981'">
+                Daftar Sekarang
             </button>
         </div>
     </form>
 
-    <div class="pt-5 mt-6 border-t border-gray-100 dark:border-gray-700/60 text-center">
-        <div class="text-sm text-gray-500">
-            Sudah punya akun? <a class="font-medium text-violet-500 hover:text-violet-600" href="{{ route('login') }}">Masuk di sini</a>
+    <!-- Garis Pembatas -->
+    <div style="position: relative; display: flex; padding: 1.5rem 0; align-items: center;">
+        <div style="flex-grow: 1; border-top: 1px solid #1f3d2c;"></div>
+    </div>
+
+    <!-- Footer Form -->
+    <div style="text-align: center;">
+        <div style="font-size: 0.875rem; color: #9ca3af;">
+            Sudah punya akun? <a style="font-weight: 500; color: #d4af37; text-decoration: none; transition: color 0.2s;" href="{{ route('login') }}" onmouseover="this.style.color='#fbbf24'" onmouseout="this.style.color='#d4af37'">Masuk di sini</a>
         </div>
     </div>
+
+    <!-- SCRIPT UNTUK CUSTOM DROPDOWN -->
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdown-menu');
+            const icon = document.getElementById('dropdown-icon');
+            if (menu.style.display === 'none') {
+                menu.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                menu.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function selectRole(value, text) {
+            // Set nilai ke input hidden agar bisa dikirim ke server
+            document.getElementById('role-input').value = value;
+            
+            // Ubah teks tombol
+            const dropdownText = document.getElementById('dropdown-text');
+            dropdownText.innerText = text;
+            dropdownText.style.color = 'white'; // Ubah warna teks jadi putih saat dipilih
+
+            // Tutup menu
+            document.getElementById('dropdown-menu').style.display = 'none';
+            document.getElementById('dropdown-icon').style.transform = 'rotate(0deg)';
+        }
+
+        // Menutup dropdown jika user klik di luar area dropdown
+        window.onclick = function(event) {
+            if (!event.target.closest('#dropdown-button') && !event.target.closest('#dropdown-menu')) {
+                document.getElementById('dropdown-menu').style.display = 'none';
+                document.getElementById('dropdown-icon').style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+
 </x-authentication-layout>
