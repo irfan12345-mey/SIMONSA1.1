@@ -9,7 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pengguna', function (Blueprint $table) {
-            $table->string('profile_photo_path', 2048)->nullable();
+            // Kolom untuk menyimpan nama file foto
+            $table->string('profile_photo_path', 2048)->nullable()->after('password');
         });
     }
 

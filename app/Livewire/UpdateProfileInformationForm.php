@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -13,21 +14,23 @@ class UpdateProfileInformationForm extends Component
 
     public $state = [];
     public $photo;
-    public $verificationLinkSent = false;
 
     public function mount()
     {
-        $user = Auth::user();
-        $this->state = [
-            'nama' => $user->nama,
-            'username' => $user->username,
-        ];
+        $this->state = Auth::user()->withoutRelations()->toArray();
     }
 
     public function updateProfileInformation(UpdatesUserProfileInformation $updater)
     {
         $this->resetErrorBag();
 
+        // Validasi disesuaikan dengan kolom database kita (nama & username)
+        Validator::make($this->state, [
+            'nama' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:50', 'unique:pengguna,username,' . Auth::id() . ',id_pengguna'],
+        ])->validateWithBag('updateProfileInformation');
+
+        // Simpan perubahan
         $updater->update(
             Auth::user(),
             $this->photo
@@ -35,30 +38,17 @@ class UpdateProfileInformationForm extends Component
                 : $this->state
         );
 
-        if (isset($this->photo)) {
-            return redirect()->route('profile.show');
-        }
-
         $this->dispatch('saved');
-        $this->dispatch('refresh-navigation-menu');
     }
 
     public function deleteProfilePhoto()
     {
         Auth::user()->deleteProfilePhoto();
-        $this->dispatch('refresh-navigation-menu');
+        $this->dispatch('refresh');
     }
 
-    // ==========================================
-    // TAMBAHKAN METHOD INI (PENYEBAB ERROR HILANG)
-    // ==========================================
-    public function getUserProperty()
+        public function render()
     {
-        return Auth::user();
-    }
-
-    public function render()
-    {
-        return view('profile.update-profile-information-form');
+        return view('livewire.update-profile-information-form');
     }
 }
